@@ -13,14 +13,17 @@ import sqlite3
 app = Flask(__name__)
 CORS(app)
 
-DB = 'nexstay.db'
+# Absolute path to the project root — works correctly on Railway & locally
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+DB_PATH = os.path.join(BASE_DIR, 'nexstay.db')
+
 _tokens = {}   # token → user_id (in-memory session store)
 UPLOAD_DIR = os.path.join(os.path.dirname(__file__), 'images', 'uploads')
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 
 # ── DB helpers ─────────────────────────────────────────────────────────────────
 def get_db():
-    conn = sqlite3.connect(DB)
+    conn = sqlite3.connect(DB_PATH)
     conn.row_factory = sqlite3.Row
     return conn
 
@@ -134,8 +137,7 @@ def init_db():
 def _serve_html(filename):
     """Read and serve an HTML file directly, bypassing Flask static routing."""
     from flask import Response
-    base = os.path.dirname(os.path.abspath(__file__))
-    path = os.path.join(base, filename)
+    path = os.path.join(BASE_DIR, filename)
     if not os.path.exists(path):
         return Response('Not found', status=404)
     with open(path, 'r', encoding='utf-8') as f:
@@ -153,9 +155,10 @@ def admin_portal():
 
 @app.route('/<path:filename>')
 def serve_static_files(filename):
-    """Fallback to serve any static file (css, js, images) if it exists."""
-    if os.path.exists(os.path.join('.', filename)):
-        return send_from_directory('.', filename)
+    """Serve any static file (css, js, images) using absolute path."""
+    full_path = os.path.join(BASE_DIR, filename)
+    if os.path.exists(full_path):
+        return send_from_directory(BASE_DIR, filename)
     return ('Not found', 404)
 
 @app.route('/images/<path:filename>')
