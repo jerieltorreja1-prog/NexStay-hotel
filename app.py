@@ -126,18 +126,6 @@ def init_db():
             c.execute("INSERT INTO rooms VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)", r)
         except: pass
 
-    # Seed sample bookings
-    now = datetime.now().isoformat()
-    bookings_seed = [
-        ('BK-2024-001','Sofia Dafers','sofia@email.com','09111111111','301','Suite','Floor 3','4 guests',6000,'2024-04-20','2024-04-23',3,18000,'Confirmed','','sofia@email.com',now),
-        ('BK-2024-002','Juan dela Cruz','juan@email.com','09222222222','101','Standard','Floor 1','2 guests',1200,'2024-04-22','2024-04-24',2,2400,'Pending','','juan@email.com',now),
-        ('BK-2024-003','Ana Reyes','ana@email.com','09333333333','202','Deluxe','Floor 2','2 guests',2500,'2024-04-18','2024-04-21',3,7500,'Completed','Extra pillows requested','ana@email.com',now),
-    ]
-    for b in bookings_seed:
-        try:
-            c.execute("INSERT INTO bookings VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)", b)
-        except: pass
-
     conn.commit()
     conn.close()
 
@@ -145,12 +133,10 @@ def init_db():
 def _serve_html(filename):
     """Read and serve an HTML file directly, bypassing Flask static routing."""
     from flask import Response
-    print(f"SERVE_HTML CALLED FOR: {filename}", flush=True)
     base = os.path.dirname(os.path.abspath(__file__))
     path = os.path.join(base, filename)
     if not os.path.exists(path):
-        print(f"FILE DOES NOT EXIST: {path}", flush=True)
-        return Response('MY CUSTOM NOT FOUND', status=404)
+        return Response('Not found', status=404)
     with open(path, 'r', encoding='utf-8') as f:
         content = f.read()
     return Response(content, mimetype='text/html')
