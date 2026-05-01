@@ -748,6 +748,7 @@ function renderMyBookings() {
 
   [...myList].reverse().forEach(b => {
     const canEdit = b.status === 'Confirmed' || b.status === 'Pending';
+    const canReview = b.status === 'Completed';
     tbody.innerHTML += `<tr>
       <td style="color:var(--accent);font-weight:600">${b.id}</td>
       <td>Rm. ${b.room} <span style="font-size:.75rem;color:var(--text-muted)">(${b.type})</span></td>
@@ -756,11 +757,16 @@ function renderMyBookings() {
       <td>${b.nights}</td>
       <td style="font-weight:700;color:var(--gold)">&#8369;${b.total.toLocaleString()}</td>
       <td>${badge(b.status)}</td>
-      <td style="display:flex;gap:.3rem;flex-wrap:wrap">
-        ${canEdit
-        ? `<button class="act-btn" onclick="editMyBooking('${b.id}')"><i class='bx bx-edit-alt'></i> Edit</button>
-             <button class="act-btn danger" onclick="cancelMyBooking('${b.id}')">Cancel</button>`
-        : '<span style="color:var(--text-muted);font-size:.78rem">—</span>'}
+      <td>
+        <div class="my-bk-notes">${b.notes ? `<i class='bx bx-comment-detail' style='color:var(--text-muted)'></i> ${b.notes}` : '<span style="color:var(--text-muted);font-size:.78rem">—</span>'}</div>
+      </td>
+      <td>
+        <div style="display:flex;gap:.4rem;flex-wrap:wrap;align-items:center">
+          ${canEdit ? `<button class="act-btn" onclick="editMyBooking('${b.id}')"><i class='bx bx-edit-alt'></i> Edit</button>
+             <button class="act-btn danger" onclick="cancelMyBooking('${b.id}')"><i class='bx bx-x'></i> Cancel</button>` : ''}
+          ${canReview ? `<button class="act-btn act-review" onclick="openReviewModal('${b.room}','${b.id}')"><i class='bx bxs-star'></i> Rate</button>` : ''}
+          ${!canEdit && !canReview ? '<span style="color:var(--text-muted);font-size:.78rem">—</span>' : ''}
+        </div>
       </td>
     </tr>`;
   });
@@ -1101,7 +1107,57 @@ function scrollToRooms() {
   document.getElementById('land-rooms-section').scrollIntoView({ behavior: 'smooth' });
 }
 
+
+/* ===== REVIEW / RATING ===== */
+let _reviewRoomId = null, _reviewBookingId = null, _reviewStarVal = 0;
+
+function openReviewModal(roomId, bookingId) {
+  _reviewRoomId = roomId;
+  _reviewBookingId = bookingId;
+  _reviewStarVal = 0;
+  // Reset UI
+  document.getElementById('review-rating').value = 0;
+  document.getElementById('review-comment').value = '';
+  document.querySelectorAll('.star-pick').forEach(s => s.classList.remove('selected'));
+  const room = rooms.find(r => r.id === roomId);
+  const titleEl = document.getElementById('review-room-title');
+  if (titleEl) titleEl.textContent = room ? `Rate: ${room.name}` : `Rate Room ${roomId}`;
+  const modal = document.getElementById('review-modal');
+  if (modal) { modal.style.display = 'flex'; document.body.style.overflow = 'hidden'; }
+}
+
+function closeReviewModal(e) {
+  const modal = document.getElementById('review-modal');
+  if (e && e.target !== modal) return;
+  if (modal) modal.style.display = 'none';
+  document.body.style.overflow = '';
+}
+
+function setReviewStar(val) {
+  _reviewStarVal = val;
+  document.getElementById('review-rating').value = val;
+  document.querySelectorAll('.star-pick').forEach(s => {
+    s.classList.toggle('selected', parseInt(s.dataset.val) <= val);
+  });
+}
+
+async function submitReview() {
+  const rating = parseInt(document.getElementById('review-rating').value);
+  const comment = document.getElementById('review-comment').value.trim();
+  if (!rating || rating < 1) { toast('Please select a star rating.', 'error'); return; }
+  if (!comment) { toast('Please write a comment.', 'error'); return; }
+  const res = await api('POST', `/api/rooms/${_reviewRoomId}/reviews`, {
+    rating, comment, booking_id: _reviewBookingId
+  });
+  if (res && res.error) { toast(res.error, 'error'); return; }
+  closeReviewModal();
+  await loadRooms();
+  renderMyBookings();
+  toast('Thank you for your review! ⭐', 'success');
+}
+
 /* ===== INIT ===== */
+
 window.onload = async function () {
   // Pre-load rooms for landing page (public, no auth needed)
   await loadRooms();
