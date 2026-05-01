@@ -83,6 +83,7 @@ def init_db():
     for u in [
         ('Sofia','Dafers','sofia@email.com','09123456789','sofia123','Admin'),
         ('Jeriel','Admin','jeriel@gmail.com','09000000000','jeriel123','Admin'),
+        ('Guest','User','guest@nexstay.com','09000000001','guest123','Guest'),
     ]:
         try:
             c.execute("INSERT INTO users (fname,lname,email,phone,pw,role) VALUES (?,?,?,?,?,?)", u)

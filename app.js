@@ -60,9 +60,9 @@ async function doLogin() {
   if (!email || !pw) { showErr(err, 'Please fill in all fields.'); return; }
   const res = await api('POST', '/api/login', { email, pw });
   if (res.error) { showErr(err, res.error); return; }
-  // Block admin accounts from the user portal
-  if (res.user && (res.user.role === 'Admin' || res.user.email === 'sofia@email.com' || res.user.email === 'jeriel@gmail.com')) {
-    showErr(err, 'Admin accounts must use the Admin Portal. Click "Admin Portal →" above.');
+  // Block admin accounts from the user portal — they must use /admin
+  if (res.user && res.user.role === 'Admin') {
+    showErr(err, 'This is the Guest Portal. Admin accounts must sign in at the Admin Portal (/admin).');
     return;
   }
   _token = res.token;
