@@ -22,5 +22,5 @@ nexstay.db
 .DS_Store
 Thumbs.db
 
-# Uploads (generated at runtime)
+# Uploaded files only (generated at runtime, not the base images)
 images/uploads/

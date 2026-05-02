@@ -8,10 +8,14 @@ sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
 
 from flask import Flask, request, jsonify, send_from_directory
 from flask_cors import CORS
+from whitenoise import WhiteNoise
 import sqlite3
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder=None)
 CORS(app)
+
+# Serve ALL static files (CSS, JS, images) via WhiteNoise — ensures correct MIME types on cloud
+app.wsgi_app = WhiteNoise(app.wsgi_app, root=os.path.dirname(os.path.abspath(__file__)), prefix='')
 
 # Absolute path to the project root — works correctly on Railway & locally
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
