@@ -911,10 +911,18 @@ async function loadRoomReviews(rid) {
   }).join('');
 }
 
-function openReviewModal() {
-  if (!selectedRoomForModal) return;
-  _reviewRoomId = selectedRoomForModal.id;
-  document.getElementById('review-room-title').textContent = `Rate: ${selectedRoomForModal.name}`;
+// roomId and bookingId can be passed directly (from My Bookings table)
+// or left blank when called from the Room Modal (uses selectedRoomForModal)
+let _reviewBookingId = null;
+function openReviewModal(roomId, bookingId) {
+  // Support calling from Room Modal (no args) OR from My Bookings row (with args)
+  const rid = roomId || (selectedRoomForModal && selectedRoomForModal.id);
+  if (!rid) return;
+  _reviewRoomId = rid;
+  _reviewBookingId = bookingId || null;
+  const room = rooms.find(r => r.id === rid);
+  const roomName = room ? room.name : `Room ${rid}`;
+  document.getElementById('review-room-title').textContent = `Rate: ${roomName}`;
   document.getElementById('review-rating').value = '0';
   document.getElementById('review-comment').value = '';
   setReviewStar(0);
@@ -923,8 +931,10 @@ function openReviewModal() {
 }
 
 function closeReviewModal(e) {
+  // Allow closing via X button (no event) or clicking the backdrop
   if (e && e.target !== document.getElementById('review-modal')) return;
   document.getElementById('review-modal').style.display = 'none';
+  document.body.style.overflow = '';
 }
 
 function setReviewStar(val) {
@@ -939,19 +949,24 @@ async function submitReview() {
   const comment = document.getElementById('review-comment').value.trim();
   if (!rating) { toast('Please select a star rating.', 'error'); return; }
   if (!_reviewRoomId) return;
-  // Find a booking ID for this room by this user
-  const bk = bookings.find(b => b.room === _reviewRoomId &&
-    (b.email === currentUser.email || b.booked_by === currentUser.email) &&
-    (b.status === 'Confirmed' || b.status === 'Completed'));
+  // Use pre-passed bookingId (from My Bookings) or find one automatically
+  let bkId = _reviewBookingId;
+  if (!bkId) {
+    const bk = bookings.find(b => b.room === _reviewRoomId &&
+      (b.email === currentUser.email || b.booked_by === currentUser.email) &&
+      (b.status === 'Confirmed' || b.status === 'Completed'));
+    bkId = bk ? bk.id : '';
+  }
   const res = await api('POST', `/api/rooms/${_reviewRoomId}/reviews`, {
-    rating, comment, booking_id: bk ? bk.id : ''
+    rating, comment, booking_id: bkId
   });
   if (res.error) { toast(res.error, 'error'); return; }
   toast('Review submitted! <i class="bx bx-star"></i>', 'success');
   document.getElementById('review-modal').style.display = 'none';
+  document.body.style.overflow = '';
   await loadRooms();
   loadRoomReviews(_reviewRoomId);
-  // Update rating display in modal
+  // Update rating display in room modal if open
   const updatedRoom = rooms.find(r => r.id === _reviewRoomId);
   if (updatedRoom) {
     const ratingEl = document.getElementById('modal-rating');
@@ -962,7 +977,7 @@ async function submitReview() {
 /* ===== TOAST ===== */
 function toast(msg, type = 'success') {
   const t = document.getElementById('toast');
-  t.textContent = msg; t.className = 'toast ' + type;
+  t.innerHTML = msg; t.className = 'toast ' + type;
   void t.offsetWidth; t.classList.add('show');
   setTimeout(() => t.classList.remove('show'), 3200);
 }
@@ -1108,53 +1123,6 @@ function scrollToRooms() {
 }
 
 
-/* ===== REVIEW / RATING ===== */
-let _reviewBookingId = null, _reviewStarVal = 0;
-
-function openReviewModal(roomId, bookingId) {
-  _reviewRoomId = roomId;
-  _reviewBookingId = bookingId;
-  _reviewStarVal = 0;
-  // Reset UI
-  document.getElementById('review-rating').value = 0;
-  document.getElementById('review-comment').value = '';
-  document.querySelectorAll('.star-pick').forEach(s => s.classList.remove('selected'));
-  const room = rooms.find(r => r.id === roomId);
-  const titleEl = document.getElementById('review-room-title');
-  if (titleEl) titleEl.textContent = room ? `Rate: ${room.name}` : `Rate Room ${roomId}`;
-  const modal = document.getElementById('review-modal');
-  if (modal) { modal.style.display = 'flex'; document.body.style.overflow = 'hidden'; }
-}
-
-function closeReviewModal(e) {
-  const modal = document.getElementById('review-modal');
-  if (e && e.target !== modal) return;
-  if (modal) modal.style.display = 'none';
-  document.body.style.overflow = '';
-}
-
-function setReviewStar(val) {
-  _reviewStarVal = val;
-  document.getElementById('review-rating').value = val;
-  document.querySelectorAll('.star-pick').forEach(s => {
-    s.classList.toggle('selected', parseInt(s.dataset.val) <= val);
-  });
-}
-
-async function submitReview() {
-  const rating = parseInt(document.getElementById('review-rating').value);
-  const comment = document.getElementById('review-comment').value.trim();
-  if (!rating || rating < 1) { toast('Please select a star rating.', 'error'); return; }
-  if (!comment) { toast('Please write a comment.', 'error'); return; }
-  const res = await api('POST', `/api/rooms/${_reviewRoomId}/reviews`, {
-    rating, comment, booking_id: _reviewBookingId
-  });
-  if (res && res.error) { toast(res.error, 'error'); return; }
-  closeReviewModal();
-  await loadRooms();
-  renderMyBookings();
-  toast('Thank you for your review! ⭐', 'success');
-}
 
 /* ===== INIT ===== */
 
