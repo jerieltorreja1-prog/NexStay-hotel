@@ -1,6 +1,7 @@
 """
 NexStay Hotel — Python Flask Backend
-Run: python app.py  →  http://localhost:5000
+Deployed on Render: https://nexstay-hotel-or45.onrender.com
+Admin portal:       https://nexstay-hotel-or45.onrender.com/admin
 """
 import sys, io, os, json, secrets, base64
 from datetime import datetime
@@ -8,14 +9,23 @@ sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
 
 from flask import Flask, request, jsonify, send_from_directory
 from flask_cors import CORS
-from whitenoise import WhiteNoise
 import sqlite3
 
-app = Flask(__name__, static_folder=None)
+# WhiteNoise is required on Render (installed via requirements.txt).
+# If running locally without it installed, Flask will serve static files instead.
+try:
+    from whitenoise import WhiteNoise
+    _whitenoise_available = True
+except ImportError:
+    _whitenoise_available = False
+
+app = Flask(__name__, static_folder='.' if not _whitenoise_available else None)
 CORS(app)
 
-# Serve ALL static files (CSS, JS, images) via WhiteNoise — ensures correct MIME types on cloud
-app.wsgi_app = WhiteNoise(app.wsgi_app, root=os.path.dirname(os.path.abspath(__file__)), prefix='')
+# Apply WhiteNoise only when available (i.e., on Render)
+if _whitenoise_available:
+    app.wsgi_app = WhiteNoise(app.wsgi_app, root=os.path.dirname(os.path.abspath(__file__)), prefix='')
+
 
 # Absolute path to the project root — works correctly on Railway & locally
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
