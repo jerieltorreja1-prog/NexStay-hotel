@@ -1109,7 +1109,7 @@ function scrollToRooms() {
 
 
 /* ===== REVIEW / RATING ===== */
-let _reviewRoomId = null, _reviewBookingId = null, _reviewStarVal = 0;
+let _reviewBookingId = null, _reviewStarVal = 0;
 
 function openReviewModal(roomId, bookingId) {
   _reviewRoomId = roomId;
