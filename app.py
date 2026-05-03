@@ -1,7 +1,7 @@
 """
 NexStay Hotel — Python Flask Backend
 Deployed on Render: https://nexstay-hotel-or45.onrender.com
-Admin portal:       https://nexstay-hotel-or45.onrender.com/admin
+Admin portal: https://nexstay-hotel-or45.onrender.com/admin
 """
 import sys, io, os, json, secrets, base64
 from datetime import datetime
@@ -99,8 +99,7 @@ def init_db():
     # Seed admin users
     for u in [
         ('Sofia','Dafers','sofia@email.com','09123456789','sofia123','Admin'),
-        ('Jeriel','Admin','jeriel@gmail.com','09000000000','jeriel123','Admin'),
-        ('Guest','User','guest@nexstay.com','09000000001','guest123','Guest'),
+        ('Jeriel','Admin','jeriel@gmail.com','09000000000','jeriel123','Admin')
     ]:
         try:
             c.execute("INSERT INTO users (fname,lname,email,phone,pw,role) VALUES (?,?,?,?,?,?)", u)
@@ -127,17 +126,7 @@ def init_db():
          'A refined executive room built for up to 3 guests with a dedicated workspace.',
          json.dumps(['WiFi','TV','AC','Mini-bar','Sofa','Work Desk']),
          json.dumps(['<i class="bx bx-bed"></i> King Bed + Sofa Bed','<i class="bx bx-chair"></i> Executive Sofa','<i class="bx bx-desktop"></i> Work Desk']),
-         json.dumps(['images/4.png','images/4a.png','images/4b.png'])),
-        ('302','The Garden View Suite','Suite','Floor 3',4,4500,'Available',4.8,'images/1b.png',
-         'A spacious suite with stunning garden views and premium furnishings for up to 4 guests.',
-         json.dumps(['WiFi','TV','AC','Mini-bar','Garden View','Balcony']),
-         json.dumps(['<i class="bx bx-bed"></i> 2 Queen Beds','<i class="bx bx-tv"></i> 55" Smart TV','<i class="bx bx-bath"></i> Soaking Tub']),
-         json.dumps(['images/1b.png','images/2a.png','images/3b.png'])),
-        ('401','The Royal Family Room','Family','Floor 4',6,6000,'Available',4.9,'images/2b.png',
-         'Our largest room, perfect for families. Fits up to 6 guests with a full living area.',
-         json.dumps(['WiFi','TV','AC','Mini-bar','Sofa','Dining Area','Kids Zone']),
-         json.dumps(['<i class="bx bx-bed"></i> 3 Queen Beds','<i class="bx bx-tv"></i> 65" Smart TV','<i class="bx bx-bath"></i> 2 Bathrooms']),
-         json.dumps(['images/2b.png','images/3a.png','images/4a.png'])),
+         json.dumps(['images/4.png','images/4a.png','images/4b.png']))
     ]
     for r in rooms_seed:
         try:

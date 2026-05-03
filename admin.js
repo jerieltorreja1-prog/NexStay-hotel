@@ -31,8 +31,8 @@ function atoast(msg, type = 'success') {
 /* ===== LOGIN ===== */
 async function adminLogin() {
   const email = document.getElementById('admin-email').value.trim();
-  const pw    = document.getElementById('admin-pw').value;
-  const err   = document.getElementById('admin-login-error');
+  const pw = document.getElementById('admin-pw').value;
+  const err = document.getElementById('admin-login-error');
   err.classList.add('hidden');
   if (!email || !pw) { ashowErr(err, 'Please fill in all fields.'); return; }
   const res = await aapi('POST', '/api/login', { email, pw });
@@ -123,7 +123,7 @@ function arenderDashboard() {
           <div style="font-weight:600;font-size:.82rem">${b.guest}</div>
           <div style="font-size:.72rem;color:var(--text-muted)">Rm.${b.room} · ${b.checkin} → ${b.checkout}</div>
         </div>
-        <span class="badge badge-${(b.status||'').toLowerCase()}">${b.status}</span>
+        <span class="badge badge-${(b.status || '').toLowerCase()}">${b.status}</span>
       </div>`).join('') : '<div style="color:var(--text-muted);font-size:.82rem;padding:.5rem 0">No bookings yet.</div>';
   }
 }
@@ -135,8 +135,8 @@ function acalRender() {
   const grid = document.getElementById('acal-grid');
   const label = document.getElementById('acal-month-label');
   if (!grid || !label) return;
-  const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
-  const DAYS = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+  const DAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
   label.textContent = `${MONTHS[acalMonth]} ${acalYear}`;
   const today = new Date().toISOString().split('T')[0];
   const firstDay = new Date(acalYear, acalMonth, 1).getDay();
@@ -154,12 +154,12 @@ function acalRender() {
   let html = DAYS.map(d => `<div class="cal-day-header">${d}</div>`).join('');
   for (let i = 0; i < firstDay; i++) html += '<div class="cal-cell empty"></div>';
   for (let d = 1; d <= daysInMonth; d++) {
-    const ds = `${acalYear}-${String(acalMonth+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const ds = `${acalYear}-${String(acalMonth + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
     const evs = dateMap[ds] || [];
     const isToday = ds === today;
     let cls = 'cal-cell'; if (isToday) cls += ' today'; if (evs.length) cls += ' has-event';
-    let evHtml = evs.slice(0,2).map(e => `<div class="cal-event ${e.type}">${e.guest.split(' ')[0]}</div>`).join('');
-    if (evs.length > 2) evHtml += `<div class="cal-event booked">+${evs.length-2}</div>`;
+    let evHtml = evs.slice(0, 2).map(e => `<div class="cal-event ${e.type}">${e.guest.split(' ')[0]}</div>`).join('');
+    if (evs.length > 2) evHtml += `<div class="cal-event booked">+${evs.length - 2}</div>`;
     html += `<div class="${cls}" onclick="acalDayClick('${ds}')">${d}${evHtml}</div>`;
   }
   grid.innerHTML = html;
@@ -184,8 +184,8 @@ function arenderAllBookings() {
       <td>${b.guest}<div style="font-size:.75rem;color:var(--text-muted)">${b.email}</div></td>
       <td>Rm. ${b.room}</td>
       <td>${b.checkin}</td><td>${b.checkout}</td>
-      <td>₱${(b.total||0).toLocaleString()}</td>
-      <td><span class="badge badge-${(b.status||'').toLowerCase()}">${b.status}</span></td>
+      <td>₱${(b.total || 0).toLocaleString()}</td>
+      <td><span class="badge badge-${(b.status || '').toLowerCase()}">${b.status}</span></td>
       <td>
         <div style="display:flex;gap:.4rem;flex-wrap:wrap">
           ${b.status === 'Confirmed' ? `<button class="act-btn act-complete" onclick="achangeStatus('${b.id}','Completed')">Complete</button>` : ''}
@@ -212,7 +212,7 @@ function arenderRoomsTable() {
     tbody.innerHTML += `<tr>
       <td><strong>${r.id}</strong></td>
       <td>${r.name}</td><td>${r.type}</td><td>${r.floor}</td>
-      <td>${r.cap}</td><td>₱${(r.rate||0).toLocaleString()}</td>
+      <td>${r.cap}</td><td>₱${(r.rate || 0).toLocaleString()}</td>
       <td><span class="badge badge-${r.status === 'Available' ? 'confirmed' : r.status === 'Occupied' ? 'pending' : 'cancelled'}">${r.status}</span></td>
       <td>${r.rating ? '★ ' + r.rating : '—'}</td>
       <td>
@@ -238,7 +238,7 @@ function aopenAddRoomModal() {
   aisAddingRoom = true; aeditingRoomId = null; amrCurrentPhotos = [];
   document.getElementById('amr-mode-label').textContent = 'ADD ROOM';
   document.getElementById('amanage-room-title').textContent = 'Add New Room';
-  ['amr-id','amr-name','amr-floor','amr-rate','amr-cap','amr-desc','amr-amenities','amr-inside'].forEach(id => document.getElementById(id).value = '');
+  ['amr-id', 'amr-name', 'amr-floor', 'amr-rate', 'amr-cap', 'amr-desc', 'amr-amenities', 'amr-inside'].forEach(id => document.getElementById(id).value = '');
   document.getElementById('amr-id').readOnly = false;
   document.getElementById('amr-type').value = 'Standard';
   document.getElementById('amr-status').value = 'Available';
@@ -283,7 +283,7 @@ function amrRenderPhotos() {
   if (!amrCurrentPhotos.length) { grid.innerHTML = '<div style="color:var(--text-muted);font-size:.82rem;padding:.5rem">No photos yet. Click "Add Photo" to upload.</div>'; return; }
   grid.innerHTML = amrCurrentPhotos.map((p, i) => `
     <div class="mr-photo-item">
-      <img src="${p.src}" alt="Photo ${i+1}" />
+      <img src="${p.src}" alt="Photo ${i + 1}" />
       <button class="mr-photo-delete" onclick="amrRemovePhoto(${i})" title="Delete"><i class='bx bx-trash'></i></button>
       ${i === 0 ? '<span class="mr-photo-main">Main</span>' : ''}
     </div>`).join('');
@@ -301,14 +301,14 @@ function amrHandleUpload(input) {
 function amrRemovePhoto(idx) { amrCurrentPhotos.splice(idx, 1); amrRenderPhotos(); }
 
 async function asaveRoomChanges() {
-  const rid  = document.getElementById('amr-id').value.trim();
+  const rid = document.getElementById('amr-id').value.trim();
   const name = document.getElementById('amr-name').value.trim();
   const type = document.getElementById('amr-type').value;
-  const floor= document.getElementById('amr-floor').value.trim();
+  const floor = document.getElementById('amr-floor').value.trim();
   const statusEl = document.getElementById('amr-status');
   const status = statusEl ? statusEl.value : 'Available';
   const rate = parseInt(document.getElementById('amr-rate').value);
-  const cap  = parseInt(document.getElementById('amr-cap').value);
+  const cap = parseInt(document.getElementById('amr-cap').value);
   const desc = document.getElementById('amr-desc').value.trim();
   const amenities = document.getElementById('amr-amenities').value.split(',').map(s => s.trim()).filter(Boolean);
   const insideLines = (document.getElementById('amr-inside').value || '').split('\n').map(s => s.trim()).filter(Boolean);
@@ -364,14 +364,14 @@ async function asaveProfile() {
 
 async function achangePassword() {
   const old = document.getElementById('aset-oldpw').value;
-  const nw  = document.getElementById('aset-newpw').value;
-  const cp  = document.getElementById('aset-cpw').value;
+  const nw = document.getElementById('aset-newpw').value;
+  const cp = document.getElementById('aset-cpw').value;
   if (!old || !nw || !cp) { atoast('Please fill in all password fields.', 'error'); return; }
   if (nw.length < 6) { atoast('New password must be at least 6 characters.', 'error'); return; }
   if (nw !== cp) { atoast('Passwords do not match.', 'error'); return; }
   const res = await aapi('PUT', '/api/me/password', { old, new: nw });
   if (res.error) { atoast(res.error, 'error'); return; }
-  ['aset-oldpw','aset-newpw','aset-cpw'].forEach(id => document.getElementById(id).value = '');
+  ['aset-oldpw', 'aset-newpw', 'aset-cpw'].forEach(id => document.getElementById(id).value = '');
   atoast('Password changed!', 'success');
 }
 
@@ -392,7 +392,7 @@ window.onload = async function () {
         ashowPage('dashboard');
         return;
       }
-    } catch(e) {}
+    } catch (e) { }
     _atoken = ''; localStorage.removeItem('nx_admin_token');
   }
 };

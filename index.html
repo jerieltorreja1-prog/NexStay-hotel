@@ -125,7 +125,7 @@
         <p class="land-hero-sub">Where Luxury Meets Comfort — Your Dream Stay Awaits</p>
         <div class="land-hero-stats">
           <div class="land-stat">
-            <div class="land-stat-num">9</div>
+            <div class="land-stat-num">4</div>
             <div class="land-stat-label">Premium Rooms</div>
           </div>
           <div class="land-stat-div"></div>
@@ -370,7 +370,8 @@
           <!-- BOOKING CALENDAR -->
           <div class="card">
             <div class="card-header">
-              <h2 class="card-title"><i class='bx bx-calendar' style='color:var(--gold);margin-right:.4rem'></i>Booking Calendar</h2>
+              <h2 class="card-title"><i class='bx bx-calendar' style='color:var(--gold);margin-right:.4rem'></i>Booking
+                Calendar</h2>
               <button class="btn-ghost" onclick="showPage('allbookings')">View All →</button>
             </div>
             <div class="cal-nav">
@@ -391,16 +392,22 @@
           <div class="side-cards">
             <!-- PORTAL LINKS (admin only) -->
             <div class="card admin-only" style="padding:1rem 1.25rem">
-              <h2 class="card-title" style="margin-bottom:.8rem"><i class='bx bx-link' style='color:var(--gold);margin-right:.4rem'></i>Portal Links</h2>
+              <h2 class="card-title" style="margin-bottom:.8rem"><i class='bx bx-link'
+                  style='color:var(--gold);margin-right:.4rem'></i>Portal Links</h2>
               <div style="display:flex;flex-direction:column;gap:.5rem">
-                <a id="admin-link-display" href="/admin" target="_blank" class="portal-link-btn portal-link-admin"><i class='bx bxs-user-badge'></i> Admin Portal <i class='bx bx-link-external' style='font-size:.75rem'></i></a>
-                <a id="user-link-display" href="/" target="_blank" class="portal-link-btn portal-link-user"><i class='bx bx-user'></i> User / Guest Portal <i class='bx bx-link-external' style='font-size:.75rem'></i></a>
+                <a id="admin-link-display" href="/admin" target="_blank" class="portal-link-btn portal-link-admin"><i
+                    class='bx bxs-user-badge'></i> Admin Portal <i class='bx bx-link-external'
+                    style='font-size:.75rem'></i></a>
+                <a id="user-link-display" href="/" target="_blank" class="portal-link-btn portal-link-user"><i
+                    class='bx bx-user'></i> User / Guest Portal <i class='bx bx-link-external'
+                    style='font-size:.75rem'></i></a>
               </div>
             </div>
             <!-- RECENT BOOKINGS -->
             <div class="card">
               <div class="card-header" style="margin-bottom:.8rem">
-                <h2 class="card-title"><i class='bx bx-list-ul' style='color:var(--gold);margin-right:.4rem'></i>Recent Bookings</h2>
+                <h2 class="card-title"><i class='bx bx-list-ul' style='color:var(--gold);margin-right:.4rem'></i>Recent
+                  Bookings</h2>
                 <button class="btn-ghost" onclick="showPage('allbookings')">View All →</button>
               </div>
               <div id="dash-recent-bookings"></div>
@@ -784,7 +791,8 @@
         <!-- Reviews Section -->
         <div class="modal-section-title" style="margin-top:1rem"><i class='bx bx-star'></i> Guest Reviews</div>
         <div id="modal-reviews-list" style="margin-bottom:.5rem"></div>
-        <button id="modal-rate-btn" class="btn-outline user-only" onclick="openReviewModal()" style="font-size:.82rem;padding:.4rem .9rem;display:none"><i class='bx bx-edit'></i> Write a Review</button>
+        <button id="modal-rate-btn" class="btn-outline user-only" onclick="openReviewModal()"
+          style="font-size:.82rem;padding:.4rem .9rem;display:none"><i class='bx bx-edit'></i> Write a Review</button>
 
         <div class="modal-actions">
           <button class="btn-outline" onclick="closeRoomModal()">← Back</button>
@@ -805,9 +813,11 @@
         <div class="form-group">
           <label style="display:flex;align-items:center;justify-content:space-between">
             <span>Room Photos</span>
-            <label for="mr-photo-upload" class="btn-ghost" style="cursor:pointer;font-size:.8rem;color:var(--gold)"><i class='bx bx-image-add'></i> Add Photo</label>
+            <label for="mr-photo-upload" class="btn-ghost" style="cursor:pointer;font-size:.8rem;color:var(--gold)"><i
+                class='bx bx-image-add'></i> Add Photo</label>
           </label>
-          <input type="file" id="mr-photo-upload" accept="image/*" multiple style="display:none" onchange="handleRoomPhotoUpload(this)" />
+          <input type="file" id="mr-photo-upload" accept="image/*" multiple style="display:none"
+            onchange="handleRoomPhotoUpload(this)" />
           <div id="mr-photo-preview" class="mr-photo-grid"></div>
         </div>
         <!-- ROOM INFO -->
@@ -836,7 +846,8 @@
         </div>
         <!-- Status (Maintenance only toggle - hidden for add, shown only for edit) -->
         <div class="form-group" id="mr-status-wrap" style="display:none">
-          <label>Room Status <span style="color:var(--text-muted);font-size:.78rem">(auto-managed by bookings)</span></label>
+          <label>Room Status <span style="color:var(--text-muted);font-size:.78rem">(auto-managed by
+              bookings)</span></label>
           <select id="mr-status">
             <option value="Available">Available</option>
             <option value="Occupied">Occupied</option>
@@ -862,8 +873,10 @@
           <input type="text" id="mr-amenities" placeholder="WiFi, TV, AC, Mini-bar" />
         </div>
         <div class="form-group">
-          <label>What's Inside This Room <span style="color:var(--text-muted);font-size:.78rem">(one item per line)</span></label>
-          <textarea id="mr-inside" rows="4" placeholder="Queen Bed&#10;42&quot; Smart TV&#10;Rain Shower&#10;Coffee Maker"></textarea>
+          <label>What's Inside This Room <span style="color:var(--text-muted);font-size:.78rem">(one item per
+              line)</span></label>
+          <textarea id="mr-inside" rows="4"
+            placeholder="Queen Bed&#10;42&quot; Smart TV&#10;Rain Shower&#10;Coffee Maker"></textarea>
         </div>
         <div class="form-actions" style="margin-top:1.2rem">
           <button class="btn-outline" onclick="closeManageRoomModal()">Cancel</button>
