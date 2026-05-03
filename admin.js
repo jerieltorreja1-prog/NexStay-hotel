@@ -96,11 +96,11 @@ function ashowPage(p) {
 
 /* ===== DASHBOARD ===== */
 function arenderDashboard() {
-  const confirmed = abookings.filter(b => b.status === 'Confirmed');
-  const revenue = confirmed.reduce((s, b) => s + b.total, 0);
+  const validBookings = abookings.filter(b => b.status === 'Confirmed' || b.status === 'Completed');
+  const revenue = validBookings.reduce((s, b) => s + b.total, 0);
   const avail = arooms.filter(r => r.status === 'Available').length;
   document.getElementById('astat-revenue').textContent = `₱${revenue.toLocaleString()}`;
-  document.getElementById('astat-confirmed').textContent = confirmed.length;
+  document.getElementById('astat-confirmed').textContent = validBookings.length;
   document.getElementById('astat-available').textContent = avail;
   document.getElementById('astat-avail-sub').textContent = `of ${arooms.length} total rooms`;
   // Calendar
@@ -113,6 +113,34 @@ function arenderDashboard() {
     <div class="status-row"><span><span class="status-dot" style="background:#00c9a7"></span>Available</span><strong>${avR}</strong></div>
     <div class="status-row"><span><span class="status-dot" style="background:#f7b731"></span>Occupied</span><strong>${occR}</strong></div>
     <div class="status-row"><span><span class="status-dot" style="background:#fd9644"></span>Maintenance</span><strong>${mntR}</strong></div>`;
+
+  // Revenue Breakdown
+  let revToday = 0, revWeek = 0, revMonth = 0, revYear = 0;
+  const todayDate = new Date();
+  const startOfDay = new Date(todayDate.getFullYear(), todayDate.getMonth(), todayDate.getDate());
+  const startOfWeek = new Date(startOfDay);
+  startOfWeek.setDate(startOfDay.getDate() - startOfDay.getDay());
+  const startOfMonth = new Date(todayDate.getFullYear(), todayDate.getMonth(), 1);
+  const startOfYear = new Date(todayDate.getFullYear(), 0, 1);
+
+  validBookings.forEach(b => {
+    const d = b.created_at ? new Date(b.created_at) : new Date(b.checkin);
+    if (d >= startOfDay) revToday += b.total;
+    if (d >= startOfWeek) revWeek += b.total;
+    if (d >= startOfMonth) revMonth += b.total;
+    if (d >= startOfYear) revYear += b.total;
+  });
+
+  const revEl = document.getElementById('arevenue-breakdown-list');
+  if (revEl) {
+    revEl.innerHTML = `
+      <div class="status-row"><span>Today</span><strong style="color:var(--gold)">₱${revToday.toLocaleString()}</strong></div>
+      <div class="status-row"><span>This Week</span><strong style="color:var(--gold)">₱${revWeek.toLocaleString()}</strong></div>
+      <div class="status-row"><span>This Month</span><strong style="color:var(--gold)">₱${revMonth.toLocaleString()}</strong></div>
+      <div class="status-row"><span>This Year</span><strong style="color:var(--gold)">₱${revYear.toLocaleString()}</strong></div>
+    `;
+  }
+
   // Recent bookings
   const rb = document.getElementById('adash-recent-bookings');
   if (rb) {

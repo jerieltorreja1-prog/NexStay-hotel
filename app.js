@@ -180,12 +180,12 @@ function showPage(p) {
 
 /* ===== DASHBOARD ===== */
 function renderDashboard() {
-  const confirmed = bookings.filter(b => b.status === 'Confirmed');
+  const validBookings = bookings.filter(b => b.status === 'Confirmed' || b.status === 'Completed');
   const pending = bookings.filter(b => b.status === 'Pending');
-  const revenue = confirmed.reduce((s, b) => s + b.total, 0);
+  const revenue = validBookings.reduce((s, b) => s + b.total, 0);
   const avail = rooms.filter(r => r.status === 'Available').length;
   animateCount('stat-revenue', revenue, '₱');
-  animateCount('stat-confirmed', confirmed.length);
+  animateCount('stat-confirmed', validBookings.length);
   animateCount('stat-available', avail);
   animateCount('stat-pending', pending.length);
   const statAvailEl = document.getElementById('stat-available-sub');
@@ -200,6 +200,34 @@ function renderDashboard() {
     <div class="status-row"><span><span class="status-dot" style="background:#00c9a7"></span>Available</span><strong>${avR}</strong></div>
     <div class="status-row"><span><span class="status-dot" style="background:#f7b731"></span>Occupied</span><strong>${occR}</strong></div>
     <div class="status-row"><span><span class="status-dot" style="background:#fd9644"></span>Maintenance</span><strong>${mntR}</strong></div>`;
+
+  // Revenue Breakdown
+  let revToday = 0, revWeek = 0, revMonth = 0, revYear = 0;
+  const todayDate = new Date();
+  const startOfDay = new Date(todayDate.getFullYear(), todayDate.getMonth(), todayDate.getDate());
+  const startOfWeek = new Date(startOfDay);
+  startOfWeek.setDate(startOfDay.getDate() - startOfDay.getDay());
+  const startOfMonth = new Date(todayDate.getFullYear(), todayDate.getMonth(), 1);
+  const startOfYear = new Date(todayDate.getFullYear(), 0, 1);
+
+  validBookings.forEach(b => {
+    const d = b.created_at ? new Date(b.created_at) : new Date(b.checkin);
+    if (d >= startOfDay) revToday += b.total;
+    if (d >= startOfWeek) revWeek += b.total;
+    if (d >= startOfMonth) revMonth += b.total;
+    if (d >= startOfYear) revYear += b.total;
+  });
+
+  const revEl = document.getElementById('revenue-breakdown-list');
+  if (revEl) {
+    revEl.innerHTML = `
+      <div class="status-row"><span>Today</span><strong style="color:var(--gold)">₱${revToday.toLocaleString()}</strong></div>
+      <div class="status-row"><span>This Week</span><strong style="color:var(--gold)">₱${revWeek.toLocaleString()}</strong></div>
+      <div class="status-row"><span>This Month</span><strong style="color:var(--gold)">₱${revMonth.toLocaleString()}</strong></div>
+      <div class="status-row"><span>This Year</span><strong style="color:var(--gold)">₱${revYear.toLocaleString()}</strong></div>
+    `;
+  }
+
   // Recent Bookings panel
   const rb = document.getElementById('dash-recent-bookings');
   if (rb) {
