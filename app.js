@@ -630,9 +630,9 @@ async function confirmBooking() {
     res = await api('POST', '/api/bookings', {
       id: bkId, guest: name, email, phone, room: rm, type, floor,
       cap: `${cap} guests`, rate: parseInt(rate), checkin: ci, checkout: co,
-      nights, total, status: 'Confirmed', notes
+      nights, total, status: 'Pending', notes
     });
-    toast('Booking confirmed! <i class="bx bx-party"></i>', 'success');
+    toast('Booking submitted and is pending approval! <i class="bx bx-time"></i>', 'success');
   }
   if (res && res.error) { toast(res.error, 'error'); return; }
   editingBookingId = null;

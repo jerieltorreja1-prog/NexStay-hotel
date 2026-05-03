@@ -188,8 +188,9 @@ function arenderAllBookings() {
       <td><span class="badge badge-${(b.status || '').toLowerCase()}">${b.status}</span></td>
       <td>
         <div style="display:flex;gap:.4rem;flex-wrap:wrap">
-          ${b.status === 'Confirmed' ? `<button class="act-btn act-complete" onclick="achangeStatus('${b.id}','Completed')">Complete</button>` : ''}
-          ${b.status === 'Confirmed' ? `<button class="act-btn act-cancel" onclick="achangeStatus('${b.id}','Cancelled')">Cancel</button>` : ''}
+          ${b.status === 'Pending' ? `<button class="act-btn" onclick="achangeStatus('${b.id}','Confirmed')">Confirm</button>` : ''}
+          ${b.status === 'Confirmed' ? `<button class="act-btn act-complete" onclick="achangeStatus('${b.id}','Completed')">Done</button>` : ''}
+          ${b.status === 'Pending' || b.status === 'Confirmed' ? `<button class="act-btn act-cancel" onclick="achangeStatus('${b.id}','Cancelled')">Cancel</button>` : ''}
         </div>
       </td>
     </tr>`;
