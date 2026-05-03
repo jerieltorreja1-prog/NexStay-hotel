@@ -383,7 +383,7 @@ def change_status(bid):
     if not is_admin(u) and (status != 'Cancelled' or bk['booked_by'] != u['email']):
         conn.close(); return jsonify({'error': 'Forbidden'}), 403
     conn.execute('UPDATE bookings SET status=? WHERE id=?', (status, bid))
-    if status == 'Cancelled':
+    if status == 'Cancelled' or status == 'Completed':
         conn.execute("UPDATE rooms SET status='Available' WHERE id=?", (bk['room'],))
     conn.commit()
     conn.close()

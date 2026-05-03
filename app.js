@@ -1081,6 +1081,9 @@ function syncBookingRoomSelect() {
 
 /* ===== LANDING PAGE ===== */
 function renderLandingRooms() {
+  const statRooms = document.getElementById('land-stat-rooms');
+  if (statRooms) statRooms.textContent = rooms.length;
+
   const grid = document.getElementById('land-rooms-grid');
   if (!grid) return;
   grid.innerHTML = '';
