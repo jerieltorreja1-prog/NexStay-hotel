@@ -628,6 +628,9 @@ function clearSummary() {
 }
 
 async function confirmBooking() {
+  const btn = document.querySelector('button[onclick="confirmBooking()"]');
+  const originalBtnHtml = btn ? btn.innerHTML : '';
+
   const name  = document.getElementById('f-name').value.trim();
   const email = document.getElementById('f-email').value.trim();
   const phone = document.getElementById('f-phone').value.trim();
@@ -647,6 +650,11 @@ async function confirmBooking() {
   localStorage.setItem('hb_counter', bookingCounter);
   const bkId = editingBookingId || `BK-${new Date().getFullYear()}-${bookingCounter}`;
 
+  if (btn) {
+    btn.disabled = true;
+    btn.innerHTML = `<i class='bx bx-loader-alt bx-spin'></i> Processing...`;
+  }
+
   let res;
   if (editingBookingId) {
     res = await api('PUT', `/api/bookings/${editingBookingId}`, {
@@ -662,7 +670,11 @@ async function confirmBooking() {
     });
     toast('Booking submitted and is pending approval! <i class="bx bx-time"></i>', 'success');
   }
-  if (res && res.error) { toast(res.error, 'error'); return; }
+  if (res && res.error) { 
+    if (btn) { btn.disabled = false; btn.innerHTML = originalBtnHtml; }
+    toast(res.error, 'error'); 
+    return; 
+  }
   editingBookingId = null;
   const titleEl = document.querySelector('#page-newbooking .page-title');
   if (titleEl) titleEl.textContent = 'New Booking — Input Form';
@@ -671,6 +683,7 @@ async function confirmBooking() {
   const bk = bookings.find(b => b.id === bkId) || { id: bkId, guest: name, email, phone, room: rm, type, floor, cap: `${cap} guests`, rate: parseInt(rate), checkin: ci, checkout: co, nights, total };
   if (isAdmin()) renderAllBookings(); else renderMyBookings();
   showConfirmation(bk);
+  if (btn) { btn.disabled = false; btn.innerHTML = originalBtnHtml; }
 }
 
 function showConfirmation(bk) {
