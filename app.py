@@ -1,11 +1,10 @@
 """
-NexStay Hotel — Python Flask Backend
-Deployed on Render: https://nexstay-hotel-or45.onrender.com
-Admin portal: https://nexstay-hotel-or45.onrender.com/admin
+NexStay Hotel - Python Flask Backend
+Deployed on Render: https://nexstay-hotel.onrender.com
+Admin portal: https://nexstay-hotel.onrender.com/admin
 """
-import sys, io, os, json, secrets, base64
+import os, json, secrets, base64
 from datetime import datetime
-sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
 
 from flask import Flask, request, jsonify, send_from_directory
 from flask_cors import CORS
@@ -27,15 +26,15 @@ if _whitenoise_available:
     app.wsgi_app = WhiteNoise(app.wsgi_app, root=os.path.dirname(os.path.abspath(__file__)), prefix='')
 
 
-# Absolute path to the project root — works correctly on Railway & locally
+# Absolute path to the project root - works correctly on Render & locally
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DB_PATH = os.path.join(BASE_DIR, 'nexstay.db')
 
-_tokens = {}   # token → user_id (in-memory session store)
+_tokens = {}   # token -> user_id (in-memory session store)
 UPLOAD_DIR = os.path.join(os.path.dirname(__file__), 'images', 'uploads')
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 
-# ── DB helpers ─────────────────────────────────────────────────────────────────
+# --- DB helpers -------------------------------------------------------------------
 def get_db():
     conn = sqlite3.connect(DB_PATH)
     conn.row_factory = sqlite3.Row
@@ -47,7 +46,7 @@ def row_to_dict(r):
 def rows_to_list(rs):
     return [dict(r) for r in rs]
 
-# ── Auth helper ────────────────────────────────────────────────────────────────
+# --- Auth helper ------------------------------------------------------------------
 def auth_user():
     h = request.headers.get('Authorization', '')
     token = h.replace('Bearer ', '').strip()
@@ -65,7 +64,7 @@ def is_admin(u):
 def safe_user(u):
     return {k: v for k, v in u.items() if k != 'pw'}
 
-# ── Init DB ────────────────────────────────────────────────────────────────────
+# --- Init DB ----------------------------------------------------------------------
 def init_db():
     conn = get_db()
     c = conn.cursor()
@@ -136,7 +135,7 @@ def init_db():
     conn.commit()
     conn.close()
 
-# ── Static files ───────────────────────────────────────────────────────────────
+# --- Static files ---------------------------------------------------------------
 def _serve_html(filename):
     """Read and serve an HTML file directly, bypassing Flask static routing."""
     from flask import Response
@@ -172,7 +171,7 @@ def serve_image(filename):
         return send_from_directory('images', filename)
     return ('Not found', 404)
 
-# ── AUTH ROUTES ────────────────────────────────────────────────────────────────
+# --- AUTH ROUTES ----------------------------------------------------------------
 @app.route('/api/login', methods=['POST'])
 def login():
     data = request.json
@@ -236,7 +235,7 @@ def change_password():
     conn.close()
     return jsonify({'ok': True})
 
-# ── ROOMS ROUTES ───────────────────────────────────────────────────────────────
+# --- ROOMS ROUTES ---------------------------------------------------------------
 def parse_room(r):
     for k in ('amenities', 'inside_items', 'gallery'):
         try: r[k] = json.loads(r.get(k) or '[]')
@@ -300,7 +299,7 @@ def delete_room(rid):
     conn.close()
     return jsonify({'ok': True})
 
-# ── IMAGE UPLOAD ───────────────────────────────────────────────────────────────
+# --- IMAGE UPLOAD ---------------------------------------------------------------
 @app.route('/api/upload-image', methods=['POST'])
 def upload_image():
     u = auth_user()
@@ -320,7 +319,7 @@ def upload_image():
         f.write(base64.b64decode(b64))
     return jsonify({'url': f'images/uploads/{safe_name}'})
 
-# ── BOOKINGS ROUTES ────────────────────────────────────────────────────────────
+# --- BOOKINGS ROUTES ------------------------------------------------------------
 @app.route('/api/bookings', methods=['GET'])
 def get_bookings():
     u = auth_user()
@@ -407,7 +406,7 @@ def dashboard():
         'recent': list(reversed(bs[-5:]))
     })
 
-# ── REVIEWS ROUTES ────────────────────────────────────────────────────────────
+# --- REVIEWS ROUTES -------------------------------------------------------------
 @app.route('/api/rooms/<rid>/reviews', methods=['GET'])
 def get_reviews(rid):
     conn = get_db()
@@ -424,7 +423,7 @@ def add_review(rid):
     rating = int(data.get('rating', 0))
     comment = data.get('comment', '').strip()
     booking_id = data.get('booking_id', '')
-    if not (1 <= rating <= 5): return jsonify({'error': 'Rating must be 1–5'}), 400
+    if not (1 <= rating <= 5): return jsonify({'error': 'Rating must be 1-5'}), 400
     conn = get_db()
     # Check if user has a booking for this room
     bk = conn.execute(
@@ -449,12 +448,12 @@ def add_review(rid):
     conn.close()
     return jsonify({'ok': True})
 
-# ── Health check (used by Render to confirm app is alive) ──────────────────────
+# --- Health check (used by Render to confirm app is alive) ----------------------
 @app.route('/health')
 def health():
     return jsonify({'status': 'ok'})
 
-# ── Startup ────────────────────────────────────────────────────────────────────
+# --- Startup --------------------------------------------------------------------
 # init_db() is called at module level so Gunicorn triggers it on startup
 init_db()
 
